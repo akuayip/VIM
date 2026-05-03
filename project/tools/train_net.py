@@ -43,7 +43,7 @@ class BestCheckpointerHook(hooks.HookBase):
     def after_step(self):
         next_iter = self.trainer.iter + 1
         is_final  = (next_iter == self.trainer.max_iter)
-        if is_final and comm.is_main_process():
+        if (next_iter % self._eval_period == 0 or is_final) and comm.is_main_process():
             self._ckpt.save("last")
             logger.info(f"[Checkpoint] last.pth disimpan (iter {self.trainer.iter})")
         if (next_iter % self._eval_period == 0 or is_final) and comm.is_main_process():
@@ -78,7 +78,6 @@ def do_train(args, cfg):
     trainer.register_hooks([
         hooks.IterationTimer(),
         hooks.LRScheduler(scheduler=instantiate(cfg.lr_multiplier)),
-        hooks.PeriodicCheckpointer(checkpointer, **cfg.train.checkpointer) if comm.is_main_process() else None,
         hooks.EvalHook(eval_period, lambda: do_test(cfg, model)),
         BestCheckpointerHook(checkpointer, cfg.train.output_dir, eval_period) if comm.is_main_process() else None,
         hooks.PeriodicWriter(default_writers(cfg.train.output_dir, cfg.train.max_iter), period=cfg.train.log_period) if comm.is_main_process() else None,

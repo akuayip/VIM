@@ -1,0 +1,24 @@
+
+# Ignore contents of these folders but keep the folders (use a tracked .gitkeep to retain the folder)
+/project/checkpoints/*
+!/project/checkpoints/.gitkeep
+/project/**/checkpoints/*
+!/project/**/checkpoints/.gitkeep
+
+/project/data/*
+!/project/data/.gitkeep
+/project/**/data/*
+!/project/**/data/.gitkeep
+
+/project/output/*
+!/project/output/.gitkeep
+/project/outputs/*
+!/project/outputs/.gitkeep
+/project/**/outputs/*
+!/project/**/outputs/.gitkeep
+
+# Common Python artifacts
+__pycache__/
+*.py[cod]
+
+
