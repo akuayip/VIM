@@ -80,7 +80,7 @@ optimizer = L(torch.optim.AdamW)(
         lr_factor_func   = partial(
             get_vim_lr_decay_rate,
             num_layers    = DEPTH,
-            lr_decay_rate = 0.0,    # backbone lr = 0 (frozen)
+            lr_decay_rate = 0.0,  
         ),
         overrides = {"pos_embed": {"weight_decay": 0.0}},
     ),

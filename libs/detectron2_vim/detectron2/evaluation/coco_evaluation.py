@@ -356,6 +356,8 @@ class COCOEvaluator(DatasetEvaluator):
             self._logger.info("Some metrics cannot be computed and is shown as NaN.")
 
         if class_names is None or len(class_names) <= 1:
+            # make AP (50:95) explicit so training logs include this name
+            results["AP50:95"] = results.get("AP", float("nan"))
             return results
         # Compute per-category AP
         # from https://github.com/facebookresearch/Detectron/blob/a6a835f5b8208c45d0dce217ce9bbda915f44df7/detectron/datasets/json_dataset_evaluator.py#L222-L252 # noqa
@@ -386,6 +388,8 @@ class COCOEvaluator(DatasetEvaluator):
         self._logger.info("Per-category {} AP: \n".format(iou_type) + table)
 
         results.update({"AP-" + name: ap for name, ap in results_per_category})
+        # also provide AP50:95 alias for the overall AP
+        results["AP50:95"] = results.get("AP", float("nan"))
         return results
 
 

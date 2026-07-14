@@ -16,9 +16,12 @@ def load_metrics(file_path):
                 continue
     return pd.DataFrame(data)
 
-df2 = load_metrics('/home/marh/Project/Vim-TA-MARH/det/work_dirs/testi_2/metrics2.json')
-df3 = load_metrics('/home/marh/Project/Vim-TA-MARH/det/work_dirs/testi_2/metrics3.json')
-df4 = load_metrics('/home/marh/Project/Vim-TA-MARH/det/work_dirs/testi_4/metrics.json')
+df1 = load_metrics('project/output/ofat_lr_0_01/metrics.json')
+df2 = load_metrics('project/output/ofat_optimizer_rmsprop/metrics.json')
+df3 = load_metrics('project/output/ofat_optimizer_sgd/metrics.json')
+
+train1 = df1[df1['total_loss'].notna()]
+eval1 = df1[df1['bbox/AP'].notna()]
 
 train2 = df2[df2['total_loss'].notna()]
 eval2 = df2[df2['bbox/AP'].notna()]
@@ -26,29 +29,27 @@ eval2 = df2[df2['bbox/AP'].notna()]
 train3 = df3[df3['total_loss'].notna()]
 eval3 = df3[df3['bbox/AP'].notna()]
 
-train4 = df4[df4['total_loss'].notna()]
-eval4 = df4[df4['bbox/AP'].notna()]
 
 # Aggregate cascade losses
-cls_cols2 = [c for c in train2.columns if c.startswith('loss_cls_stage')]
-box_cols2 = [c for c in train2.columns if c.startswith('loss_box_reg_stage')]
-cls_cols3 = [c for c in train3.columns if c.startswith('loss_cls_stage')]
-box_cols3 = [c for c in train3.columns if c.startswith('loss_box_reg_stage')]
-cls_cols4 = [c for c in train4.columns if c.startswith('loss_cls_stage')]
-box_cols4 = [c for c in train4.columns if c.startswith('loss_box_reg_stage')]
+cls_cols1 = [c for c in train1.columns if c.startswith('loss_cls')]
+box_cols1 = [c for c in train1.columns if c.startswith('loss_box_reg')]
+cls_cols2 = [c for c in train2.columns if c.startswith('loss_cls')]
+box_cols2 = [c for c in train2.columns if c.startswith('loss_box_reg')]
+cls_cols3 = [c for c in train3.columns if c.startswith('loss_cls')]
+box_cols3 = [c for c in train3.columns if c.startswith('loss_box_reg')]
 
+train1['loss_cls_sum'] = train1[cls_cols1].sum(axis=1)
+train1['loss_box_sum'] = train1[box_cols1].sum(axis=1)
 train2['loss_cls_sum'] = train2[cls_cols2].sum(axis=1)
 train2['loss_box_sum'] = train2[box_cols2].sum(axis=1)
 train3['loss_cls_sum'] = train3[cls_cols3].sum(axis=1)
 train3['loss_box_sum'] = train3[box_cols3].sum(axis=1)
-train4['loss_cls_sum'] = train4[cls_cols4].sum(axis=1)
-train4['loss_box_sum'] = train4[box_cols4].sum(axis=1)
 
 # Plot 1: Total Loss
 plt.figure(figsize=(10, 6))
-plt.plot(train2['iteration'], train2['total_loss'], label='Experiment 2 (metrics2)', alpha=0.6)
-plt.plot(train3['iteration'], train3['total_loss'], label='Experiment 3 (metrics3)', alpha=0.6)
-plt.plot(train4['iteration'], train4['total_loss'], label='Experiment 4 (metrics4)', alpha=0.6)
+plt.plot(train1['iteration'], train1['total_loss'], label='Adam (metrics1)', alpha=0.6)
+plt.plot(train2['iteration'], train2['total_loss'], label='RMSprop (metrics2)', alpha=0.6)
+plt.plot(train3['iteration'], train3['total_loss'], label='SGD (metrics3)', alpha=0.6)
 plt.title('Total Loss Comparison')
 plt.xlabel('Iteration')
 plt.ylabel('Total Loss')
@@ -60,9 +61,9 @@ plt.close()
 
 # Plot 2: mAP (bbox/AP)
 plt.figure(figsize=(10, 6))
-plt.plot(eval2['iteration'], eval2['bbox/AP'], marker='o', label='Experiment 2 (metrics2)')
-plt.plot(eval3['iteration'], eval3['bbox/AP'], marker='s', label='Experiment 3 (metrics3)')
-plt.plot(eval4['iteration'], eval4['bbox/AP'], marker='^', label='Experiment 4 (metrics4)')
+plt.plot(eval1['iteration'], eval1['bbox/AP'], marker='o', label='Adam (metrics1)')
+plt.plot(eval2['iteration'], eval2['bbox/AP'], marker='s', label='RMSprop (metrics2)')
+plt.plot(eval3['iteration'], eval3['bbox/AP'], marker='^', label='SGD (metrics3)')
 plt.title('mAP (bbox/AP) Comparison')
 plt.xlabel('Iteration')
 plt.ylabel('mAP')
@@ -74,9 +75,9 @@ plt.close()
 
 # Plot 3: AP50
 plt.figure(figsize=(10, 6))
-plt.plot(eval2['iteration'], eval2['bbox/AP50'], marker='o', label='Experiment 2 (metrics2)')
-plt.plot(eval3['iteration'], eval3['bbox/AP50'], marker='s', label='Experiment 3 (metrics3)')
-plt.plot(eval4['iteration'], eval4['bbox/AP50'], marker='^', label='Experiment 4 (metrics4)')
+plt.plot(eval1['iteration'], eval1['bbox/AP50'], marker='o', label='Adam (metrics1)')
+plt.plot(eval2['iteration'], eval2['bbox/AP50'], marker='s', label='RMSprop (metrics2)')
+plt.plot(eval3['iteration'], eval3['bbox/AP50'], marker='^', label='SGD (metrics3)')
 plt.title('AP50 Comparison')
 plt.xlabel('Iteration')
 plt.ylabel('AP50')
@@ -88,9 +89,9 @@ plt.close()
 
 # Plot 4: AP75
 plt.figure(figsize=(10, 6))
-plt.plot(eval2['iteration'], eval2['bbox/AP75'], marker='o', label='Experiment 2 (metrics2)')
-plt.plot(eval3['iteration'], eval3['bbox/AP75'], marker='s', label='Experiment 3 (metrics3)')
-plt.plot(eval4['iteration'], eval4['bbox/AP75'], marker='^', label='Experiment 4 (metrics4)')
+plt.plot(eval1['iteration'], eval1['bbox/AP75'], marker='o', label='Adam (metrics1)')
+plt.plot(eval2['iteration'], eval2['bbox/AP75'], marker='s', label='RMSprop (metrics2)')
+plt.plot(eval3['iteration'], eval3['bbox/AP75'], marker='^', label='SGD (metrics3)')
 plt.title('AP75 Comparison')
 plt.xlabel('Iteration')
 plt.ylabel('AP75')
@@ -102,9 +103,9 @@ plt.close()
 
 # Plot 5: Classification Loss (sum of stage0/1/2)
 plt.figure(figsize=(10, 6))
-plt.plot(train2['iteration'], train2['loss_cls_sum'], label='Experiment 2 (metrics2)', alpha=0.7)
-plt.plot(train3['iteration'], train3['loss_cls_sum'], label='Experiment 3 (metrics3)', alpha=0.7)
-plt.plot(train4['iteration'], train4['loss_cls_sum'], label='Experiment 4 (metrics4)', alpha=0.7)
+plt.plot(train1['iteration'], train1['loss_cls_sum'], label='Adam (metrics1)', alpha=0.7)
+plt.plot(train2['iteration'], train2['loss_cls_sum'], label='RMSprop (metrics2)', alpha=0.7)
+plt.plot(train3['iteration'], train3['loss_cls_sum'], label='SGD (metrics3)', alpha=0.7)
 plt.title('Classification Loss Comparison (Sum of Stages)')
 plt.xlabel('Iteration')
 plt.ylabel('Loss CLS (sum)')
@@ -116,9 +117,9 @@ plt.close()
 
 # Plot 6: Box Regression Loss (sum of stage0/1/2)
 plt.figure(figsize=(10, 6))
-plt.plot(train2['iteration'], train2['loss_box_sum'], label='Experiment 2 (metrics2)', alpha=0.7)
-plt.plot(train3['iteration'], train3['loss_box_sum'], label='Experiment 3 (metrics3)', alpha=0.7)
-plt.plot(train4['iteration'], train4['loss_box_sum'], label='Experiment 4 (metrics4)', alpha=0.7)
+plt.plot(train1['iteration'], train1['loss_box_sum'], label='Adam (metrics1)', alpha=0.7)
+plt.plot(train2['iteration'], train2['loss_box_sum'], label='RMSprop (metrics2)', alpha=0.7)
+plt.plot(train3['iteration'], train3['loss_box_sum'], label='SGD (metrics3)', alpha=0.7)
 plt.title('Box Regression Loss Comparison (Sum of Stages)')
 plt.xlabel('Iteration')
 plt.ylabel('Loss BOX (sum)')
@@ -132,9 +133,9 @@ plt.close()
 fig, axes = plt.subplots(2, 3, figsize=(22, 11))
 
 ax = axes[0, 0]
-ax.plot(train2['iteration'], train2['total_loss'], label='Experiment 2 (metrics2)', alpha=0.7)
-ax.plot(train3['iteration'], train3['total_loss'], label='Experiment 3 (metrics3)', alpha=0.7)
-ax.plot(train4['iteration'], train4['total_loss'], label='Experiment 4 (metrics4)', alpha=0.7)
+ax.plot(train1['iteration'], train1['total_loss'], label='Adam (metrics1)', alpha=0.7)
+ax.plot(train2['iteration'], train2['total_loss'], label='RMSprop (metrics2)', alpha=0.7)
+ax.plot(train3['iteration'], train3['total_loss'], label='SGD (metrics3)', alpha=0.7)
 ax.set_title('Total Loss Comparison')
 ax.set_xlabel('Iteration')
 ax.set_ylabel('Total Loss')
@@ -142,9 +143,9 @@ ax.grid(True, alpha=0.3)
 ax.legend(fontsize=8)
 
 ax = axes[0, 1]
-ax.plot(eval2['iteration'], eval2['bbox/AP'], marker='o', label='Experiment 2 (metrics2)')
-ax.plot(eval3['iteration'], eval3['bbox/AP'], marker='s', label='Experiment 3 (metrics3)')
-ax.plot(eval4['iteration'], eval4['bbox/AP'], marker='^', label='Experiment 4 (metrics4)')
+ax.plot(eval1['iteration'], eval1['bbox/AP'], marker='o', label='Adam (metrics1)')
+ax.plot(eval2['iteration'], eval2['bbox/AP'], marker='s', label='RMSprop (metrics2)')
+ax.plot(eval3['iteration'], eval3['bbox/AP'], marker='^', label='SGD (metrics3)')
 ax.set_title('mAP (bbox/AP) Comparison')
 ax.set_xlabel('Iteration')
 ax.set_ylabel('mAP')
@@ -152,9 +153,9 @@ ax.grid(True, alpha=0.3)
 ax.legend(fontsize=8)
 
 ax = axes[0, 2]
-ax.plot(eval2['iteration'], eval2['bbox/AP50'], marker='o', label='Experiment 2 (metrics2)')
-ax.plot(eval3['iteration'], eval3['bbox/AP50'], marker='s', label='Experiment 3 (metrics3)')
-ax.plot(eval4['iteration'], eval4['bbox/AP50'], marker='^', label='Experiment 4 (metrics4)')
+ax.plot(eval1['iteration'], eval1['bbox/AP50'], marker='o', label='Adam (metrics1)')
+ax.plot(eval2['iteration'], eval2['bbox/AP50'], marker='s', label='RMSprop (metrics2)')
+ax.plot(eval3['iteration'], eval3['bbox/AP50'], marker='^', label='SGD (metrics3)')
 ax.set_title('AP50 Comparison')
 ax.set_xlabel('Iteration')
 ax.set_ylabel('AP50')
@@ -162,9 +163,9 @@ ax.grid(True, alpha=0.3)
 ax.legend(fontsize=8)
 
 ax = axes[1, 0]
-ax.plot(eval2['iteration'], eval2['bbox/AP75'], marker='o', label='Experiment 2 (metrics2)')
-ax.plot(eval3['iteration'], eval3['bbox/AP75'], marker='s', label='Experiment 3 (metrics3)')
-ax.plot(eval4['iteration'], eval4['bbox/AP75'], marker='^', label='Experiment 4 (metrics4)')
+ax.plot(eval1['iteration'], eval1['bbox/AP75'], marker='o', label='Adam (metrics1)')
+ax.plot(eval2['iteration'], eval2['bbox/AP75'], marker='s', label='RMSprop (metrics2)')
+ax.plot(eval3['iteration'], eval3['bbox/AP75'], marker='^', label='SGD (metrics3)')
 ax.set_title('AP75 Comparison')
 ax.set_xlabel('Iteration')
 ax.set_ylabel('AP75')
@@ -172,9 +173,9 @@ ax.grid(True, alpha=0.3)
 ax.legend(fontsize=8)
 
 ax = axes[1, 1]
-ax.plot(train2['iteration'], train2['loss_cls_sum'], label='Experiment 2 (metrics2)', alpha=0.7)
-ax.plot(train3['iteration'], train3['loss_cls_sum'], label='Experiment 3 (metrics3)', alpha=0.7)
-ax.plot(train4['iteration'], train4['loss_cls_sum'], label='Experiment 4 (metrics4)', alpha=0.7)
+ax.plot(train1['iteration'], train1['loss_cls_sum'], label='Adam (metrics1)', alpha=0.7)
+ax.plot(train2['iteration'], train2['loss_cls_sum'], label='RMSprop (metrics2)', alpha=0.7)
+ax.plot(train3['iteration'], train3['loss_cls_sum'], label='SGD (metrics3)', alpha=0.7)
 ax.set_title('Classification Loss Comparison (Sum of Stages)')
 ax.set_xlabel('Iteration')
 ax.set_ylabel('Loss CLS (sum)')
@@ -182,21 +183,32 @@ ax.grid(True, alpha=0.3)
 ax.legend(fontsize=8)
 
 ax = axes[1, 2]
-ax.plot(train2['iteration'], train2['loss_box_sum'], label='Experiment 2 (metrics2)', alpha=0.7)
-ax.plot(train3['iteration'], train3['loss_box_sum'], label='Experiment 3 (metrics3)', alpha=0.7)
-ax.plot(train4['iteration'], train4['loss_box_sum'], label='Experiment 4 (metrics4)', alpha=0.7)
+ax.plot(train1['iteration'], train1['loss_box_sum'], label='Adam (metrics1)', alpha=0.7)
+ax.plot(train2['iteration'], train2['loss_box_sum'], label='RMSprop (metrics2)', alpha=0.7)
+ax.plot(train3['iteration'], train3['loss_box_sum'], label='SGD (metrics3)', alpha=0.7)
 ax.set_title('Box Regression Loss Comparison (Sum of Stages)')
 ax.set_xlabel('Iteration')
 ax.set_ylabel('Loss BOX (sum)')
 ax.grid(True, alpha=0.3)
 ax.legend(fontsize=8)
 
-fig.suptitle('Overall Comparison: Experiment 2 vs 3 vs 4', fontsize=16)
+fig.suptitle('Overall Comparison: lr 0.01 vs 2 vs 3', fontsize=16)
 fig.tight_layout(rect=[0, 0.02, 1, 0.96])
 fig.savefig(OUTPUT_DIR / 'overall_comparison.svg', format='svg')
 plt.close(fig)
 
 final_metrics = {
+    'metrics1': {
+        'final_loss': train1['total_loss'].iloc[-1],
+        'max_mAP': eval1['bbox/AP'].max(),
+        'final_mAP': eval1['bbox/AP'].iloc[-1],
+        'max_AP50': eval1['bbox/AP50'].max(),
+        'final_AP50': eval1['bbox/AP50'].iloc[-1],
+        'max_AP75': eval1['bbox/AP75'].max(),
+        'final_AP75': eval1['bbox/AP75'].iloc[-1],
+        'final_loss_cls_sum': train1['loss_cls_sum'].iloc[-1],
+        'final_loss_box_sum': train1['loss_box_sum'].iloc[-1],
+    },
     'metrics2': {
         'final_loss': train2['total_loss'].iloc[-1],
         'max_mAP': eval2['bbox/AP'].max(),
@@ -219,17 +231,7 @@ final_metrics = {
         'final_loss_cls_sum': train3['loss_cls_sum'].iloc[-1],
         'final_loss_box_sum': train3['loss_box_sum'].iloc[-1],
     },
-    'metrics4': {
-        'final_loss': train4['total_loss'].iloc[-1],
-        'max_mAP': eval4['bbox/AP'].max(),
-        'final_mAP': eval4['bbox/AP'].iloc[-1],
-        'max_AP50': eval4['bbox/AP50'].max(),
-        'final_AP50': eval4['bbox/AP50'].iloc[-1],
-        'max_AP75': eval4['bbox/AP75'].max(),
-        'final_AP75': eval4['bbox/AP75'].iloc[-1],
-        'final_loss_cls_sum': train4['loss_cls_sum'].iloc[-1],
-        'final_loss_box_sum': train4['loss_box_sum'].iloc[-1],
-    }
+
 }
 with open(OUTPUT_DIR / 'final_metrics.json', 'w') as f:
     json.dump(final_metrics, f, indent=2)

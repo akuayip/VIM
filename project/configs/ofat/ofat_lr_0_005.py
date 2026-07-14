@@ -18,7 +18,7 @@ from configs.data.head_coco_loader import dataloader
 PRETRAINED_VIM   = "checkpoints/vim_tiny_pretrained.pth"
 NUM_TRAIN_IMAGES = 1271
 EPOCHS           = 100
-BATCH_SIZE       = 16
+BATCH_SIZE       = 8
 DEPTH            = 24
 ITERS_PER_EPOCH  = NUM_TRAIN_IMAGES // BATCH_SIZE
 MAX_ITER         = ITERS_PER_EPOCH * EPOCHS
@@ -59,7 +59,7 @@ optimizer = L(torch.optim.AdamW)(
         lr_factor_func   = partial(
             get_vim_lr_decay_rate,
             num_layers    = DEPTH,
-            lr_decay_rate = 0.0,    # backbone lr = 0 (frozen)
+            lr_decay_rate = 0.0,    
         ),
         overrides = {"pos_embed": {"weight_decay": 0.0}},
     ),

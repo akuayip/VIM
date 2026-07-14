@@ -24,14 +24,13 @@ HEAD_DETECTION_PROJECT/
     ├── configs/
     │   ├── models/faster_rcnn_vimdet.py
     │   ├── data/head_coco_loader.py
-    │   ├── ofat/generate_ofat_configs.py
+    │   ├── ofat/                    ← config eksperimen OFAT
     │   └── head_detection_baseline.py  ← edit NUM_TRAIN_IMAGES
     ├── tools/
     │   ├── train_net.py
     │   ├── eval_efficiency.py
     │   └── eval_effectiveness.py
     ├── scripts/
-    │   ├── run_ofat.py
     │   ├── analyze_ofat.py
     │   └── compare_models.py
     └── outputs/                    ← hasil training tersimpan di sini
@@ -59,7 +58,4 @@ python tools/train_net.py \
     --config-file configs/head_detection_baseline.py \
     --num-gpus 1
 
-# OFAT search
-python configs/ofat/generate_ofat_configs.py
-python scripts/run_ofat.py --num_gpus 1
 ```

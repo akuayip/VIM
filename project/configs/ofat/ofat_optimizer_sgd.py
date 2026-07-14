@@ -16,7 +16,7 @@ from configs.models.faster_rcnn_vimdet import model
 from configs.data.head_coco_loader import dataloader
 
 PRETRAINED_VIM   = "checkpoints/vim_tiny_pretrained.pth"
-NUM_TRAIN_IMAGES = 5000
+NUM_TRAIN_IMAGES = 1271
 EPOCHS           = 100
 BATCH_SIZE       = 16
 DEPTH            = 24
@@ -54,7 +54,7 @@ lr_multiplier = L(WarmupParamScheduler)(
 
 optimizer = L(torch.optim.SGD)(
     params=L(get_default_optimizer_params)(
-        base_lr="{"..lr"}",
+        base_lr          = "${..lr}",
         weight_decay_norm=0.0,
         lr_factor_func=partial(get_vim_lr_decay_rate, num_layers=DEPTH, lr_decay_rate=0.0),
     ),
